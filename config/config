@@ -1,0 +1,7 @@
+TEMPFILE=/var/tmp/debie
+LOGDIR=/var/log/debie
+LASTRUN="$LOGDIR/last-run-datetime"
+LOG_APT="$LOGDIR/log-temp-apt"
+LOG_FLATPAK="$LOGDIR/log-temp-flatpak"
+LOG_STARTUP="$LOGDIR/last-startup"
+APTKEPTBACKFLAG=/var/tmp/debie-apt-kept-back-flag
