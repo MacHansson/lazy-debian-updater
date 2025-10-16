@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TrayDialog</class>
+ <widget class="QDialog" name="TrayDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>120</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>120</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>400</width>
+    <height>120</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>TrayDialog</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="QIcon::ThemeIcon::SystemReboot"/>
+  </property>
+  <widget class="QLabel" name="labelLastUpdate">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>3</y>
+     <width>351</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Last update: </string>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelResult">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>39</y>
+     <width>331</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>There is no recent information available.</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::TextFormat::RichText</enum>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="bnRefresh">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>5</y>
+     <width>26</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressBar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>380</width>
+     <height>10</height>
+    </rect>
+   </property>
+   <property name="maximum">
+    <number>100</number>
+   </property>
+   <property name="value">
+    <number>0</number>
+   </property>
+   <property name="textVisible">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="bnLogs">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>5</y>
+     <width>26</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="bnSettings">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>5</y>
+     <width>26</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::FocusPolicy::NoFocus</enum>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>18</width>
+     <height>18</height>
+    </size>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelLastRun">
+   <property name="geometry">
+    <rect>
+     <x>213</x>
+     <y>97</y>
+     <width>181</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::TextInteractionFlag::NoTextInteraction</set>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

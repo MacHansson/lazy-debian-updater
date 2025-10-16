@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/svg/failed-dark.svg</file>
+        <file>resources/svg/failed-light.svg</file>
+        <file>resources/svg/success-dark.svg</file>
+        <file>resources/svg/success-light.svg</file>
+        <file>resources/svg/uptodate-dark.svg</file>
+        <file>resources/svg/uptodate-light.svg</file>
+        <file>resources/svg/working-dark.svg</file>
+        <file>resources/svg/working-light.svg</file>
+        <file>resources/svg/working-xterm-dark.svg</file>
+        <file>resources/svg/working-xterm-light.svg</file>
+        <file>resources/svg/refresh-dark.svg</file>
+        <file>resources/svg/refresh-light.svg</file>
+        <file>resources/svg/settings-dark.svg</file>
+        <file>resources/svg/settings-light.svg</file>
+        <file>resources/svg/text-dark.svg</file>
+        <file>resources/svg/text-light.svg</file>
+    </qresource>
+</RCC>
