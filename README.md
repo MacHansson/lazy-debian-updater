@@ -1,2 +1,2 @@
 # lazy-debian-updater
-The easiest automatic debian updater for apt and flatpak. KDE only.
+The simplest automatic debian updater for apt and flatpak for lazy users. KDE only.
