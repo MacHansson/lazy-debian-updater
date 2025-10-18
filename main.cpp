@@ -8,7 +8,7 @@
 #include <userconfig.h>
 #include <appconfig.h>
 
-bool DEBUG = false;
+bool DEBUG = true;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);

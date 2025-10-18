@@ -54,7 +54,7 @@
     <rect>
      <x>10</x>
      <y>39</y>
-     <width>331</width>
+     <width>371</width>
      <height>71</height>
     </rect>
    </property>
@@ -67,13 +67,16 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>There is no recent information available.</string>
+    <string>Running ...</string>
    </property>
    <property name="textFormat">
     <enum>Qt::TextFormat::RichText</enum>
    </property>
    <property name="alignment">
     <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
    </property>
    <property name="textInteractionFlags">
     <set>Qt::TextInteractionFlag::NoTextInteraction</set>

@@ -20,6 +20,12 @@ class TrayDialog : public FramelessDialog
         Active = 1
     };
 
+    enum Theme {
+        Automatic = 0,
+        Light,
+        Dark
+    } m_activeTheme{Automatic};
+
 public:
 
     explicit TrayDialog(QWidget *parent = nullptr);
@@ -41,8 +47,11 @@ private:
     Ui::TrayDialog *ui;
     QDateTime dateTimeLastRun;
     QTimer *timerProgressBar;
+    QMenu *menuSettings;
+    QMenu *menuTheme;
 
-    void updateButtonIcons(bool darkMode);
+    void updateButtonIcons();
+    void setTheme(Theme theme);
 
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);

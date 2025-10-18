@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <QStyleFactory>
 #include <QMenu>
+#include <QActionGroup>
 #include <QProcess>
 #include <QStyle>
 
@@ -17,7 +18,7 @@ TrayDialog::TrayDialog(QWidget *parent)
     ui->labelResult->setMouseTracking(false);
     ui->labelLastRun->setMouseTracking(false);
     ui->labelLastUpdate->setMouseTracking(false); // Set because mouse event needs to be passed on to dialog widget to enable click & drag
-    updateButtonIcons(darkMode());
+    updateButtonIcons();
 
     timerProgressBar = new QTimer();
     timerProgressBar->setInterval(33);
@@ -28,6 +29,30 @@ TrayDialog::TrayDialog(QWidget *parent)
             value = 0;
         ui->progressBar->setValue(value);
     });
+
+    menuSettings = new QMenu("Settings");
+    menuTheme = new QMenu("Theme");
+
+    QObject::connect(menuTheme, &QMenu::aboutToShow, [this]() {
+        for(QAction *a : menuTheme->actions()) {
+            a->setText(a->text().remove("> "));
+        }
+        QAction *active = menuTheme->actions().at((int)m_activeTheme);
+        active->setText("> " + active->text());
+    });
+    menuSettings->addMenu(menuTheme);
+    menuTheme->addAction(new QAction("Automatic"));
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Automatic); });
+    menuTheme->addAction(new QAction("Light"));
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Light); });
+    menuTheme->addAction(new QAction("Dark"));
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Dark); });
+
+    QActionGroup groupTheme(this);
+    groupTheme.setExclusive(true);
+    for(QAction *a : menuTheme->actions()) {
+        a->setActionGroup(&groupTheme);
+    }
 
     if(DEBUG) {
         setMessage("Line 1 ... Currently running in<br>Line 2 ... DEBUG MODE<br>Line 3 ... optional");
@@ -117,7 +142,7 @@ void TrayDialog::changeEvent(QEvent *event)
 {
     if(event->type() == QEvent::PaletteChange) {
         if(DEBUG) qDebug() << "Theme changed to" << style()->objectName() << "with" << (darkMode() ? "dark" : "light") << "mode";
-        updateButtonIcons(darkMode());
+        updateButtonIcons();
         emit themeChanged();
     }
     QWidget::changeEvent(event);
@@ -149,6 +174,7 @@ void TrayDialog::showEvent(QShowEvent *event)
 
 void TrayDialog::on_bnRefresh_clicked()
 {
+    ui->labelResult->setText("Running ...");
     emit refresh();
 }
 
@@ -157,9 +183,13 @@ void TrayDialog::on_bnLogs_clicked()
     emit showLogDialog();
 }
 
-void TrayDialog::updateButtonIcons(bool darkMode)
+void TrayDialog::updateButtonIcons()
 {
-    if(darkMode) {
+    bool isDarkMode{true};
+    if(m_activeTheme != Automatic) {
+        isDarkMode = (m_activeTheme == Light) ? false : true;
+    }
+    if(isDarkMode) {
         ui->bnLogs->setIcon(QIcon(":/resources/svg/text-dark.svg"));
         ui->bnRefresh->setIcon(QIcon(":/resources/svg/refresh-dark.svg"));
         ui->bnSettings->setIcon(QIcon(":/resources/svg/settings-dark.svg"));
@@ -170,8 +200,55 @@ void TrayDialog::updateButtonIcons(bool darkMode)
     }
 }
 
+void TrayDialog::setTheme(Theme theme)
+{
+    m_activeTheme = theme;
+    switch(theme)
+    {
+        case Automatic: {
+            qApp->setPalette(QPalette());
+            break;
+        }
+        case Light: {
+            QPalette lightPalette;
+            lightPalette.setColor(QPalette::Window, QColor(240, 240, 240));
+            lightPalette.setColor(QPalette::WindowText, Qt::black);
+            lightPalette.setColor(QPalette::Base, Qt::white);
+            lightPalette.setColor(QPalette::AlternateBase, QColor(225, 225, 225));
+            lightPalette.setColor(QPalette::ToolTipBase, Qt::white);
+            lightPalette.setColor(QPalette::ToolTipText, Qt::black);
+            lightPalette.setColor(QPalette::Text, Qt::black);
+            lightPalette.setColor(QPalette::Button, QColor(240, 240, 240));
+            lightPalette.setColor(QPalette::ButtonText, Qt::black);
+            lightPalette.setColor(QPalette::BrightText, Qt::red);
+            lightPalette.setColor(QPalette::Highlight, QColor(76, 163, 224)); // light blue
+            lightPalette.setColor(QPalette::HighlightedText, Qt::white);
+            qApp->setPalette(lightPalette);
+            break;
+        }
+        case Dark: {
+            QPalette darkPalette;
+            darkPalette.setColor(QPalette::Window, QColor(17, 17, 17));
+            darkPalette.setColor(QPalette::WindowText, Qt::white);
+            darkPalette.setColor(QPalette::Base, QColor(42, 42, 42));
+            darkPalette.setColor(QPalette::AlternateBase, QColor(66, 66, 66));
+            darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+            darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+            darkPalette.setColor(QPalette::Text, Qt::white);
+            darkPalette.setColor(QPalette::Button, QColor(17, 17, 17));
+            darkPalette.setColor(QPalette::ButtonText, Qt::white);
+            darkPalette.setColor(QPalette::BrightText, Qt::red);
+            darkPalette.setColor(QPalette::Highlight, QColor(142, 45, 197).lighter()); // purple-ish
+            darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+            qApp->setPalette(darkPalette);
+            break;
+        }
+    }
+}
+
 void TrayDialog::on_bnSettings_clicked()
 {
-
+    menuSettings->show();
+    menuSettings->move(pos() + QPoint(width() - menuSettings->width(), (-1)*menuSettings->height()));
 }
 
