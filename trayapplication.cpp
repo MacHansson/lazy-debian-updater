@@ -3,37 +3,40 @@
 #include <QSvgRenderer>
 #include <QPainter>
 #include <QTransform>
+#include <QPropertyAnimation>
 #include <QMenu>
 
 #include <debugflag.h>
 
-TrayApplication::TrayApplication(QString logDirectory, QObject *parent)
-    : QObject{parent}
+TrayApplication::TrayApplication(UserConfig *p ,QString logDirectory, QObject *parent)
+    : QObject{parent}, userConfig(p)
 {
     trayIcon = new QSystemTrayIcon(QIcon(""));
 
-    dlgTray = new TrayDialog();
-    QObject::connect(dlgTray, &TrayDialog::positionChanged, [&](QPoint pos) {
+    dlgTray = new TrayDialog(p);
+    QObject::connect(dlgTray, &TrayDialog::positionChanged, this, [&](QPoint pos) {
         emit trayDialogPositionChanged(pos);
     });
-    QObject::connect(dlgTray, &TrayDialog::themeChanged, [&]() {
+    QObject::connect(dlgTray, &TrayDialog::themeChanged, this, [&]() {
         setIcon(lastIcon, currentAngleInDegrees);
     });
-    QObject::connect(dlgTray, &TrayDialog::refresh, [&]() {
+    QObject::connect(dlgTray, &TrayDialog::refresh, this, [&]() {
         emit refresh();
     });
 
     dlgLog = new LogDialog(logDirectory);
-    QObject::connect(dlgTray, &TrayDialog::showLogDialog, [&]() {
+    QObject::connect(dlgTray, &TrayDialog::showLogDialog, this, [&]() {
         dlgLog->updateLogs();
-        dlgLog->show();
+        dlgLog->showBeautiful();
     });
 
     timerRotate = new QTimer();
     timerRotate->setInterval(1000 / framesPerSecRotation);
     timerRotate->setSingleShot(false);
 
-    QObject::connect(trayIcon, &QSystemTrayIcon::activated, [&]() {
+    QObject::connect(trayIcon, &QSystemTrayIcon::activated, this, [&](QSystemTrayIcon::ActivationReason reason) {
+        Q_UNUSED(reason)
+
         if(!dlgTray->isVisible()) {
             QPoint globalCursorPos = QCursor::pos();
             QScreen *screen = qApp->screenAt(globalCursorPos);
@@ -55,17 +58,17 @@ TrayApplication::TrayApplication(QString logDirectory, QObject *parent)
             }
 
             if(DEBUG) qDebug() << "Moving tray dialog to:" << x << y;
-            dlgTray->move(x, y);
+            dlgTray->move(x + screen->availableGeometry().x(), y + screen->availableGeometry().y());
 
-            dlgTray->show();
+            dlgTray->showBeautiful();
             dlgTray->raise();
             dlgTray->activateWindow();
         } else {
-            dlgTray->hide();
+            dlgTray->hideBeautiful();
         }
     });
 
-    QObject::connect(timerRotate, &QTimer::timeout, [&]() {
+    QObject::connect(timerRotate, &QTimer::timeout, this, [&]() {
         currentAngleInDegrees += stepAngleInDegrees;
         if(currentAngleInDegrees > 360.0) {
             currentAngleInDegrees -= 360.0;
@@ -90,6 +93,8 @@ TrayApplication::~TrayApplication()
 
 void TrayApplication::setIcon(QString icon, int rotationInDegreesPerSec)
 {
+    if(icon.isEmpty() && DEBUG) { qWarning() << "Tried to set empty icon -> Abort"; return; }
+
     QString iconFilePath = icon + (dlgTray->darkMode() ? "-dark" : "-light") + ".svg";
     if (iconFilePath == lastIconFilePath) {
         if(DEBUG) qDebug() << "Doing nothing, icon already set:"  << iconFilePath;

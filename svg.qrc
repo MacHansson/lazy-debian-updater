@@ -16,5 +16,12 @@
         <file>resources/svg/settings-light.svg</file>
         <file>resources/svg/text-dark.svg</file>
         <file>resources/svg/text-light.svg</file>
+        <file>resources/svg/Close-Dark.svg</file>
+        <file>resources/svg/Close-Light.svg</file>
+        <file>resources/svg/PinOff-Dark.svg</file>
+        <file>resources/svg/PinOff-Light.svg</file>
+        <file>resources/svg/PinOn.svg</file>
+        <file>resources/svg/Delete-Dark.svg</file>
+        <file>resources/svg/Delete-Light.svg</file>
     </qresource>
 </RCC>

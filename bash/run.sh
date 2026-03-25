@@ -35,8 +35,11 @@ rename_log_file() {
     local RESULT="$2"
     if [ -s "$OLD" ]; then
         mv "$OLD" "$NEW"
-        if [ "$RESULT" -gt 1 ]; then
+        if [ "$RESULT" -eq 3 ]; then
             mv "$NEW" "$NEW-error"
+        fi
+        if [ "$RESULT" -eq 2 ]; then
+            mv "$NEW" "$NEW-warning"
         fi
     fi
 }
@@ -63,10 +66,12 @@ fi
 # Flatpak update
 flatpak update -y | grep -vE 'Looking for updates|Nothing to do' > "$LOG_FLATPAK" 2>&1 # Remove this lines
 if [ "$(wc -l < $LOG_FLATPAK)" -gt 1 ]; then
-    if ! grep -Eiq 'error|failed' "$LOG_FLATPAK"; then
-        RESULT_FLATPAK=1
-    else
+    if grep -Eiq 'error|failed' "$LOG_FLATPAK"; then
         RESULT_FLATPAK=3
+    elif grep -Eiq 'Installation complete|Updates complete|Changes complete|Uninstall complete' "$LOG_FLATPAK"; then
+        RESULT_FLATPAK=1
+    elif grep -Eiq 'end-of-life|no longer supported' "$LOG_FLATPAK"; then
+        RESULT_FLATPAK=2
     fi
 else
     RESULT_FLATPAK=0

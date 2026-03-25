@@ -8,20 +8,23 @@
 #include <userconfig.h>
 #include <appconfig.h>
 
-bool DEBUG = true;
+bool DEBUG {false};
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+
+    if(QApplication::applicationDirPath().contains("build")) {
+        qDebug() << "Detecting start from within the build-directory, activating debugging ...";
+        DEBUG = true;
+    }
 
     ExternalAppManager extAppMan;
     AppConfig appConfig(QApplication::applicationDirPath() + "/config");
     UserConfig userConfig(QDir::homePath() + "/.config/debie");
 
-    TrayApplication trayApp(appConfig.getValue("LOGDIR"));
-    //trayApp.setDialogPosition(userConfig.getTrayDialogPosition());
+    TrayApplication trayApp(&userConfig, appConfig.getValue("LOGDIR"));
     QObject::connect(&trayApp, &TrayApplication::quitApplication, [&]() { QApplication::quit(); });
-    //QObject::connect(&trayApp, &TrayApplication::trayDialogPositionChanged, [&](QPoint pos) { userConfig.setTrayDialogPosition(pos); });
-    QObject::connect(&trayApp, &TrayApplication::refresh, [&]() {
+    QObject::connect(&trayApp, &TrayApplication::refresh, &trayApp, [&]() {
         if(!DEBUG) {
             extAppMan.runExternalApp("bash", QApplication::applicationDirPath() + "/run.sh");
         } else {

@@ -1,6 +1,8 @@
 #ifndef TRAYDIALOG_H
 #define TRAYDIALOG_H
 
+#include <userconfig.h>
+
 #include <framelessdialog.h>
 #include <QCloseEvent>
 #include <QKeyEvent>
@@ -28,7 +30,7 @@ class TrayDialog : public FramelessDialog
 
 public:
 
-    explicit TrayDialog(QWidget *parent = nullptr);
+    explicit TrayDialog(UserConfig *p, QWidget *parent = nullptr);
     ~TrayDialog();
 
     void setStatus(int status);
@@ -45,10 +47,11 @@ private slots:
 private:
 
     Ui::TrayDialog *ui;
+    UserConfig *userConfig      {nullptr};
     QDateTime dateTimeLastRun;
-    QTimer *timerProgressBar;
-    QMenu *menuSettings;
-    QMenu *menuTheme;
+    QTimer *timerProgressBar    {nullptr};
+    QMenu *menuSettings         {nullptr};
+    QMenu *menuTheme            {nullptr};
 
     void updateButtonIcons();
     void setTheme(Theme theme);

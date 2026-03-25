@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,10,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,10,0,0">
      <item>
       <widget class="QLabel" name="label">
        <property name="font">
@@ -42,6 +42,50 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="bnPin">
+       <property name="minimumSize">
+        <size>
+         <width>26</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>26</width>
+         <height>26</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton:checked {
+	background-color: rgb(115, 3, 27);
+}
+
+QPushButton:!checked {
+	
+	background-color: rgb(107, 107, 107);
+}</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="bnHide">
        <property name="minimumSize">
         <size>
@@ -61,18 +105,129 @@
        <property name="text">
         <string/>
        </property>
-       <property name="icon">
-        <iconset theme="QIcon::ThemeIcon::GoDown"/>
-       </property>
        <property name="iconSize">
         <size>
-         <width>22</width>
-         <height>22</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLineEdit" name="leSearch">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="placeholderText">
+        <string> Search for log file content, space seperated, case insensitive, ...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="bnClearFilter">
+       <property name="minimumSize">
+        <size>
+         <width>52</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>52</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::FocusPolicy::NoFocus</enum>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="svg.qrc">
+         <normaloff>:/resources/svg/Delete-Dark.svg</normaloff>:/resources/svg/Delete-Dark.svg</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>28</width>
+         <height>28</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="laInfo">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string> Info</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="laWarning">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: #de0046;</string>
+     </property>
+     <property name="text">
+      <string> Warning</string>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,3">
@@ -116,6 +271,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="svg.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -19,7 +19,7 @@ FileWatcher::FileWatcher(QString watchedFile, QString svgDir, QObject *parent)
     }
 
     watcher.addPath(file.fileName());
-    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, [&](const QString &path) {
+    QObject::connect(&watcher, &QFileSystemWatcher::fileChanged, this, [&](const QString &path) {
         QString line = readFirstLine(path);
         if(!line.isEmpty()) {
             interpret(line);

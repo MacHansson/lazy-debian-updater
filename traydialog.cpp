@@ -7,12 +7,12 @@
 #include <QActionGroup>
 #include <QProcess>
 #include <QStyle>
+#include <QPropertyAnimation>
 
 #include <debugflag.h>
 
-TrayDialog::TrayDialog(QWidget *parent)
-    : FramelessDialog(parent)
-    , ui(new Ui::TrayDialog)
+TrayDialog::TrayDialog(UserConfig *p, QWidget *parent)
+    : FramelessDialog(parent), ui(new Ui::TrayDialog), userConfig(p)
 {
     ui->setupUi(this);
     ui->labelResult->setMouseTracking(false);
@@ -23,7 +23,7 @@ TrayDialog::TrayDialog(QWidget *parent)
     timerProgressBar = new QTimer();
     timerProgressBar->setInterval(33);
     timerProgressBar->setSingleShot(false);
-    QObject::connect(timerProgressBar, &QTimer::timeout, [this]() {
+    QObject::connect(timerProgressBar, &QTimer::timeout, this, [this]() {
         int value = ui->progressBar->value() + 1;
         if(value > ui->progressBar->maximum())
             value = 0;
@@ -33,20 +33,23 @@ TrayDialog::TrayDialog(QWidget *parent)
     menuSettings = new QMenu("Settings");
     menuTheme = new QMenu("Theme");
 
-    QObject::connect(menuTheme, &QMenu::aboutToShow, [this]() {
+    QObject::connect(menuTheme, &QMenu::aboutToShow, this, [this]() {
         for(QAction *a : menuTheme->actions()) {
-            a->setText(a->text().remove("> "));
+            a->setText(a->text().remove("[").remove("]"));
         }
         QAction *active = menuTheme->actions().at((int)m_activeTheme);
-        active->setText("> " + active->text());
+        active->setText("[" + active->text() + "]");
     });
+    menuSettings->addAction(new QAction("Close Menu"));
+    QObject::connect(menuSettings->actions().last(), &QAction::triggered, this, [this]() { menuSettings->hide(); });
+    menuSettings->addSeparator();
     menuSettings->addMenu(menuTheme);
     menuTheme->addAction(new QAction("Automatic"));
-    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Automatic); });
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, this, [this]() { setTheme(Theme::Automatic); });
     menuTheme->addAction(new QAction("Light"));
-    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Light); });
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, this, [this]() { setTheme(Theme::Light); });
     menuTheme->addAction(new QAction("Dark"));
-    QObject::connect(menuTheme->actions().last(), &QAction::triggered, [this]() { setTheme(Theme::Dark); });
+    QObject::connect(menuTheme->actions().last(), &QAction::triggered, this, [this]() { setTheme(Theme::Dark); });
 
     QActionGroup groupTheme(this);
     groupTheme.setExclusive(true);
@@ -61,6 +64,8 @@ TrayDialog::TrayDialog(QWidget *parent)
     // Hide GUI elements
     ui->progressBar->hide();
     ui->labelLastRun->hide();
+
+    setTheme((Theme)userConfig->getTheme());
 }
 
 TrayDialog::~TrayDialog()
@@ -97,19 +102,25 @@ void TrayDialog::setLastUpdateDateTime(QDateTime dateTime)
     float hoursToday = (float)QDateTime::currentDateTime().time().hour() + (float)QDateTime::currentDateTime().time().minute()/60.0 + (float)QDateTime::currentDateTime().time().second()/3600.0;
     float diff = hoursElapsed - hoursToday;
 
-    if(diff < 0.0) {
+    if(diff < 0) {
         ui->labelLastUpdate->setText("Last updated today");
     } else if(diff < 24.0) {
         ui->labelLastUpdate->setText("Last updated yesterday");
-    } else if(diff < 48.0) {
+    } else if(diff < 2*24.0) {
         ui->labelLastUpdate->setText("Last updated 2 days ago");
-    } else if(diff < 72.0) {
+    } else if(diff < 3*24.0) {
         ui->labelLastUpdate->setText("Last updated 3 days ago");
+    } else if(diff < 4*24.0) {
+        ui->labelLastUpdate->setText("Last updated 4 days ago");
+    } else if(diff < 5*24.0) {
+        ui->labelLastUpdate->setText("Last updated 5 days ago");
+    } else if(diff < 6*24.0) {
+        ui->labelLastUpdate->setText("Last updated 6 days ago");
+    } else if(diff < 10*24.0) {
+        ui->labelLastUpdate->setText("Last updated a week ago");
     } else {
-        ui->labelLastUpdate->setText("Last updated some days ago");
+        ui->labelLastUpdate->setText("Last updated: " + dateTime.toString("dd.MM.yyyy"));
     }
-
-    //ui->labelLastUpdate->setText("Last update: " + dateTime.toString("dd.MM.yyyy hh:mm"));
 }
 
 void TrayDialog::setMessage(QString message)
@@ -125,7 +136,7 @@ bool TrayDialog::darkMode()
 void TrayDialog::closeEvent(QCloseEvent *event)
 {
     event->ignore();
-    hide();
+    hideBeautiful();
 }
 
 void TrayDialog::keyPressEvent(QKeyEvent *event)
@@ -133,7 +144,7 @@ void TrayDialog::keyPressEvent(QKeyEvent *event)
     switch(event->key()) {
         case Qt::Key_Escape: {
             event->accept();
-            hide();
+            hideBeautiful();
         }
     }
 }
@@ -164,8 +175,12 @@ void TrayDialog::showEvent(QShowEvent *event)
         text = QString::number(minutesAgo) + " minutes ago";
     } else if(minutesAgo < 90) {
         text =  "1 hour ago";
-    } else {
+    } else if(minutesAgo < 1440) {
         text = QString::number(qRound((float)minutesAgo / 60.0)) + " hours ago";
+    } else if(minutesAgo < 2880){
+        text = "1 day ago";
+    } else {
+        text = "More than a day ago";
     }
 
     ui->labelLastRun->setText(text);
@@ -180,6 +195,7 @@ void TrayDialog::on_bnRefresh_clicked()
 
 void TrayDialog::on_bnLogs_clicked()
 {
+    hideBeautiful();
     emit showLogDialog();
 }
 
@@ -188,6 +204,12 @@ void TrayDialog::updateButtonIcons()
     bool isDarkMode{true};
     if(m_activeTheme != Automatic) {
         isDarkMode = (m_activeTheme == Light) ? false : true;
+    } else {
+        QColor windowColor = palette().color(QPalette::Window);
+        double brightness = 0.299 * windowColor.red() +
+                            0.587 * windowColor.green() +
+                            0.114 * windowColor.blue();
+        isDarkMode = (brightness < 128);
     }
     if(isDarkMode) {
         ui->bnLogs->setIcon(QIcon(":/resources/svg/text-dark.svg"));
@@ -203,6 +225,7 @@ void TrayDialog::updateButtonIcons()
 void TrayDialog::setTheme(Theme theme)
 {
     m_activeTheme = theme;
+    userConfig->setTheme((int)m_activeTheme);
     switch(theme)
     {
         case Automatic: {
@@ -228,14 +251,14 @@ void TrayDialog::setTheme(Theme theme)
         }
         case Dark: {
             QPalette darkPalette;
-            darkPalette.setColor(QPalette::Window, QColor(17, 17, 17));
+            darkPalette.setColor(QPalette::Window, QColor(27, 27, 27));
             darkPalette.setColor(QPalette::WindowText, Qt::white);
             darkPalette.setColor(QPalette::Base, QColor(42, 42, 42));
             darkPalette.setColor(QPalette::AlternateBase, QColor(66, 66, 66));
             darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
             darkPalette.setColor(QPalette::ToolTipText, Qt::white);
             darkPalette.setColor(QPalette::Text, Qt::white);
-            darkPalette.setColor(QPalette::Button, QColor(17, 17, 17));
+            darkPalette.setColor(QPalette::Button, QColor(32, 32, 32));
             darkPalette.setColor(QPalette::ButtonText, Qt::white);
             darkPalette.setColor(QPalette::BrightText, Qt::red);
             darkPalette.setColor(QPalette::Highlight, QColor(142, 45, 197).lighter()); // purple-ish
@@ -249,6 +272,6 @@ void TrayDialog::setTheme(Theme theme)
 void TrayDialog::on_bnSettings_clicked()
 {
     menuSettings->show();
-    menuSettings->move(pos() + QPoint(width() - menuSettings->width(), (-1)*menuSettings->height()));
+    menuSettings->move(pos() + QPoint(width() - menuSettings->width(), 0 /*(-1)*menuSettings->height()*/));
 }
 

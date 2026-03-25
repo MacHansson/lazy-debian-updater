@@ -2,7 +2,7 @@
 #define LOGDIALOG_H
 
 #include <framelessdialog.h>
-#include <QFileInfo>
+#include <QFileInfoList>
 #include <QListWidgetItem>
 
 namespace Ui {
@@ -21,15 +21,23 @@ public:
     void updateLogs();
     QDateTime getLastLogDateTime();
 
+private:
+
+    void updateButtonIcons();
+
 private slots:
 
     void on_listLogs_itemClicked(QListWidgetItem *item);
     void on_bnHide_clicked();
+    void on_leSearch_editingFinished();
+    void changeEvent(QEvent *event);
 
 private:
 
     Ui::LogDialog *ui;
     QString m_logDirectory;
+    QFileInfoList m_lFiles;
+    QList<int> m_lSearchResults;
 
     static bool compareByDate(const QFileInfo &a, const QFileInfo &b);
 };

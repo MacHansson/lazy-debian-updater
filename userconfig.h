@@ -12,8 +12,8 @@ public:
 
     explicit UserConfig(QString filePath, QObject *parent = nullptr);
 
-    QPoint getTrayDialogPosition();             // deprecated - position of tray dialog ist set automatically
-    void setTrayDialogPosition(QPoint pos);     // deprecated - position of tray dialog ist set automatically
+    void setTheme(int theme);
+    int getTheme();
 
 private:
 

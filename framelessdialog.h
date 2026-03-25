@@ -14,6 +14,10 @@ public:
     explicit FramelessDialog(QWidget *parent = nullptr);
     ~FramelessDialog() override = default;
 
+    void showBeautiful();
+    void hideBeautiful();
+    void setPinned(bool pin = true);
+
 signals:
 
     void positionChanged(const QPoint &newPosition);
@@ -28,7 +32,8 @@ protected:
 
 private:
 
-    bool m_dragging = false;
+    bool m_pinned {false};
+    bool m_dragging {false};
     QPoint m_dragStartPos;
     QPoint m_windowStartPos;
 };

@@ -3,6 +3,7 @@
 
 #include <traydialog.h>
 #include <logdialog.h>
+#include <userconfig.h>
 
 #include <QObject>
 #include <QSystemTrayIcon>
@@ -15,7 +16,7 @@ class TrayApplication : public QObject
 
 public:
 
-    explicit TrayApplication(QString logDirectory, QObject *parent = nullptr);
+    explicit TrayApplication(UserConfig *p, QString logDirectory, QObject *parent = nullptr);
     ~TrayApplication();
 
 public slots:
@@ -31,6 +32,7 @@ protected:
     QSystemTrayIcon *trayIcon           {nullptr};
     TrayDialog *dlgTray                 {nullptr};
     LogDialog *dlgLog                   {nullptr};
+    UserConfig *userConfig              {nullptr};
     QString lastIcon                    {""};
     QString lastIconFilePath            {""};
     QString lastMessage                 {""};
