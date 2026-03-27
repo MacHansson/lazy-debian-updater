@@ -16,6 +16,17 @@ LogDialog::LogDialog(QString logDirectory, QWidget *parent)
     ui->setupUi(this);
     updateButtonIcons();
 
+    m_pChart = new ChartWrapper(ui->chart);
+    QObject::connect(m_pChart, &ChartWrapper::sig_dateHovered, [this] (QDate date) {
+        for(int i=0; i<m_lFiles.size(); i++) {
+            if(m_lFiles.at(i).baseName().contains(date.toString("yyyy-MM-dd"))) {
+                QListWidgetItem *item = ui->listLogs->item(i);
+                ui->listLogs->setCurrentItem(item);
+                ui->textEditSelectedLog->clear();
+            }
+        }
+    });
+
     ui->laInfo->setVisible(false);
     ui->laWarning->setVisible(false);
     QObject::connect(ui->bnClearFilter, &QPushButton::clicked, this, [this] () { ui->leSearch->clear(); on_leSearch_editingFinished(); });
@@ -32,15 +43,22 @@ void LogDialog::updateLogs()
     QDir dir(m_logDirectory);
     m_lFiles = dir.entryInfoList();
     std::sort(m_lFiles.begin(), m_lFiles.end(), LogDialog::compareByDate);
+    for(int i=m_lFiles.size()-1; i>-1; i--) {
+        if(m_lFiles.at(i).baseName().size() < 3 || m_lFiles.at(i).baseName().contains("last")) {
+            m_lFiles.removeAt(i);
+        }
+    }
 
     if(DEBUG) qDebug().noquote() << "Reading file list from log directory" << m_logDirectory << "and found" << m_lFiles.size() << "files";
 
     ui->listLogs->clear();
+    QList<QDateTime> dateTimes;
+    QList<double> count;
     if(m_lSearchResults.isEmpty()) { // No search active
         for (QFileInfo info : m_lFiles) {
-            if(info.baseName().size() > 3 && !info.baseName().contains("last")) {
-                ui->listLogs->addItem(info.baseName() + (!info.suffix().isEmpty() ? ("." + info.suffix()) : ""));
-            }
+            dateTimes.append(info.lastModified());
+            count.append(1);
+            ui->listLogs->addItem(info.baseName() + (!info.suffix().isEmpty() ? ("." + info.suffix()) : ""));
         }
     } else { // Search active ...
         if(m_lSearchResults.at(0) == -1) { // ... nothing found, no results available
@@ -49,6 +67,8 @@ void LogDialog::updateLogs()
         } else { // ... results available
             for(int i : m_lSearchResults) {
                 QFileInfo info = m_lFiles.at(i);
+                dateTimes.append(info.lastModified());
+                count.append(1);
                 ui->listLogs->addItem(info.baseName() + (!info.suffix().isEmpty() ? ("." + info.suffix()) : ""));
             }
         }
@@ -58,6 +78,8 @@ void LogDialog::updateLogs()
         QListWidgetItem *item = ui->listLogs->item(0);
         ui->listLogs->setCurrentItem(item);
         on_listLogs_itemClicked(item);
+
+        m_pChart->setChartData(dateTimes, count);
     }
 }
 

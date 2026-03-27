@@ -1,4 +1,4 @@
-QT       += core gui widgets svg
+QT       += core gui widgets svg charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     appconfig.cpp \
+    chartwrapper.cpp \
     externalappmanager.cpp \
     filewatcher.cpp \
     framelessdialog.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 
 HEADERS += \
     appconfig.h \
+    chartwrapper.h \
     debugflag.h \
     externalappmanager.h \
     filewatcher.h \

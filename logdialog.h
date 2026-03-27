@@ -4,6 +4,7 @@
 #include <framelessdialog.h>
 #include <QFileInfoList>
 #include <QListWidgetItem>
+#include <chartwrapper.h>
 
 namespace Ui {
 class LogDialog;
@@ -35,6 +36,7 @@ private slots:
 private:
 
     Ui::LogDialog *ui;
+    ChartWrapper *m_pChart;
     QString m_logDirectory;
     QFileInfoList m_lFiles;
     QList<int> m_lSearchResults;
